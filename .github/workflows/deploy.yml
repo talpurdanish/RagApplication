@@ -9,6 +9,12 @@ jobs:
     runs-on: [self-hosted, webapi]
     steps:
       - uses: actions/checkout@v3
+      - name: 🔍 Show Docker Context
+        run: |
+          echo "=== Current directory ==="
+          pwd
+          echo "=== Files ==="
+          ls -R RagWebApi-Tests/RagWebApi
       - name: 🛠️ Build WebAPI Docker Image
         run: |
           echo "=== Building WebAPI Docker Image ==="
@@ -19,6 +25,12 @@ jobs:
     runs-on: [self-hosted, client]
     steps:
       - uses: actions/checkout@v3
+      - name: 🔍 Show Docker Context
+        run: |
+          echo "=== Current directory ==="
+          pwd
+          echo "=== Files ==="
+          ls -R RagClient
       - name: 🎨 Build Rag Client Docker Image
         run: |
           echo "=== Building Client Docker Image ==="
