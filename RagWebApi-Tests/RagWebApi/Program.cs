@@ -44,19 +44,12 @@ services.AddDbContext<RagContext>(options =>
     options.EnableServiceProviderCaching();
 });
 
-Console.WriteLine(connectionString);
 
 services.AddControllers();
 
 string jinaKey = config["JINA_KEY"]!;
 string openRouterApiKey = config["OPEN_ROUTER_KEY"]!;
 string cloudFlareKey = config["CLOUD_FLARE_KEY"]!;
-
-
-Console.WriteLine(jinaKey);
-Console.WriteLine(openRouterApiKey);
-Console.WriteLine(cloudFlareKey);
-
 
 services.AddKeyedSingleton<JinaClient>(serviceKey: null, (serviceProvider, _) =>
     new JinaClient(jinaKey));
@@ -131,10 +124,7 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
-
 }
-
-
 
 app.UseRouting();
 app.UseCors("CorsPolicy");
@@ -143,6 +133,5 @@ app.MapHealthChecks("/health");
 app.MapControllers();
 
 var url = app.Environment.IsDevelopment() ? "https://localhost:4100" : "http://localhost:6100";
-
 
 app.Run(url);
