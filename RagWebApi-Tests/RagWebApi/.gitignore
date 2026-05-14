@@ -1,0 +1,86 @@
+﻿# Build results
+bin/
+obj/
+out/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / JetBrains
+.idea/
+
+# Logs
+*.log
+
+# NuGet packages
+*.nupkg
+packages/
+# Uncomment if using package restore
+# !packages/build/
+
+# Azure build artifacts
+*.azurepubxml
+*.pubxml
+*.publishproj
+
+# Publish output
+publish/
+*.PublishSettings
+
+# Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+# DotCover
+*.dotCover
+
+# TFS
+$tf/
+
+# Others
+*.dbmdl
+*.bak
+*.mdf
+*.ldf
+*.ndf
+
+# VS Code
+.vscode/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.cache
+
+# User secrets
+secrets.json
+
+# Environment variables
+.env
+
+# Coverage reports
+coverage/
+*.coverage
+*.coveragexml
+
+# Generated files
+Generated_Code/
+
+# Backup & autosave
+*~
+*.bak
+*.backup
+*.autosave
+
+# Node (if using frontend with Web API)
+node_modules/
+dist/
+
+# Docker
+docker-compose.override.yml
+*.dockerfile

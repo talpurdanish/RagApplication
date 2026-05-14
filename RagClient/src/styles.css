@@ -1,0 +1,512 @@
+@import 'tailwindcss';
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+@import 'tailwindcss/utilities.css' layer(utilities);
+/* PrimeReact theme */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes blinkColor {
+  0%,
+  100% {
+    color: red;
+  }
+
+  50% {
+    color: var(--text-color);
+  }
+}
+.progress {
+  animation: progress 1s infinite linear;
+}
+
+.left-right {
+  transform-origin: 0% 50%;
+}
+@keyframes progress {
+  0% {
+    transform: translateX(0) scaleX(0);
+  }
+  40% {
+    transform: translateX(0) scaleX(0.4);
+  }
+  100% {
+    transform: translateX(100%) scaleX(0.5);
+  }
+}
+
+/* =========================
+   Theme Variables
+   ========================= */
+/* Light theme variables */
+.light {
+  /* deep blue, matches logo ring */
+  --color-secondary: #2563eb;
+  /* brighter blue accent */
+  --color-danger: #dc2626;
+  /* red cross urgency */
+  --color-info: #0ea5e9;
+  /* medical info blue */
+  --color-warning: #f59e0b;
+  /* amber for alerts */
+  --color-success: #16a34a;
+  /* green for positive states */
+  --color-background: #ffffff;
+  --color-text: #1f2937;
+  --color-hover-text: #fff;
+  --inputnumber-border-color: var(--color-gray-300);
+}
+
+/* Dark Theme */
+.dark {
+  --color-primary: #93c5fd;
+  /* lighter blue for dark bg */
+  --color-secondary: #60a5fa;
+  /* softer blue accent */
+  --color-danger: #f87171;
+  /* lighter red for visibility */
+  --color-info: #38bdf8;
+  /* cyan info */
+  --color-warning: #fbbf24;
+  /* bright amber */
+  --color-success: #4ade80;
+  /* light green */
+  --color-background: #111827;
+  --color-text: #f9fafb;
+  --color-hover-text: #000000;
+
+  --inputnumber-border-color: var(--color-gray-600);
+}
+
+@font-face {
+  font-family: 'ni7seg';
+  src: url('assets/fonts/ni7seg.woff') format('woff2');
+}
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  --digital-font: 'ni7Seg';
+
+  color-scheme: light dark;
+  color: var(--color-text);
+  background-color: var(--color-background);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+}
+
+/* Menu list */
+.menu {
+  list-style: none;
+  padding: 0rem;
+  margin: 0;
+}
+
+.sub-menu,
+.sub-menu-collapsed {
+  list-style: none;
+  margin: 0;
+}
+
+/* Menu items */
+.menu > li,
+.sub-menu > li,
+.sub-menu-collapsed > li {
+  margin-bottom: 0;
+}
+
+.menu > li > a,
+.sub-menu > li > a,
+.sub-menu-collapsed > li > a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem;
+  text-decoration: none;
+  color: var(--color-text);
+  font-weight: 500;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+  border-bottom: 1px solid var(--gray-700);
+  border-top: 0px;
+  border-radius: 0px;
+}
+
+.sub-menu-collapsed > li > a {
+  border-right: 1px solid var(--gray-700);
+}
+
+.sub-menu > li > a,
+.sub-menu-collapsed > li > a {
+  background: var(--color-background);
+}
+
+.sub-menu-collapsed > li:first-child > a,
+.menu > li:first-child > a {
+  border-top: 1px solid var(--gray-700);
+}
+
+.sub-menu-collapsed > li:first-child > a {
+  border-top-right-radius: 6px;
+}
+
+.sub-menu > li:first-child > a {
+  border-top: 0px;
+}
+
+.sub-menu-collapsed > li:last-child a {
+  border-bottom-right-radius: 6px;
+}
+
+/* Hover effect */
+.menu > li > a:hover,
+.sub-menu > li > a:hover,
+.sub-menu-collapsed > li > a:hover {
+  background-color: var(--color-warning);
+  color: var(--color-hover-text);
+  cursor: pointer;
+}
+
+/* Active state */
+.menu > li > a.active,
+.sub-menu > li > a.active,
+.sub-menu-collapsed > li > a:active {
+  background-color: var(--color-warning);
+  color: var(--color-hover-text);
+  font-weight: 600;
+}
+
+.small-width .p-inputnumber-input {
+  max-width: 80% !important;
+  width: 80% !important;
+  min-width: 80% !important;
+}
+
+/* =========================
+   Header
+   ========================= */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 65px;
+  padding: 0 1.5rem;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  border-bottom: 1px solid var(--gray-700);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* Left side: menu icon */
+.header .menu-icon {
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--color-text);
+  transition: color 0.25s ease;
+}
+
+.header .menu-icon:hover {
+  color: var(--color-hover-text);
+}
+
+/* Right side: user menu + notifications */
+.header .user-menu,
+.header .notifications {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header .user-menu a,
+.header .notifications a {
+  text-decoration: none;
+  color: var(--color-text);
+  font-weight: 500;
+  transition: color 0.25s ease;
+}
+
+.header .user-menu a:hover,
+.header .notifications a:hover {
+  color: var(--color-hover-text);
+}
+
+/* =========================
+   Footer
+   ========================= */
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 55px;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  border-top: 1px solid var(--gray-700);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.main {
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-text);
+}
+
+.btn-group {
+  @apply flex overflow-hidden w-auto;
+}
+
+.btn {
+  @apply flex items-center cursor-pointer font-medium dark:text-white text-black transition-colors duration-200 disabled:from-gray-300 disabled:to-gray-400 disabled:hover:from-gray-300 disabled:hover:to-gray-400 disabled:text-gray-500;
+}
+
+.btn-group .btn {
+  @apply p-2 border-r dark:border-gray-400 border-gray-700;
+}
+
+.btn-group .btn:first-child {
+  @apply rounded-tl-sm rounded-bl-sm;
+}
+
+.btn-group .btn:last-child {
+  @apply rounded-tr-sm rounded-br-sm border-r-0;
+}
+
+.btn-padding-xs {
+  @apply p-0;
+}
+
+.btn-padding-sm {
+  @apply gap-1 px-2 py-1;
+}
+
+.btn-padding-md {
+  @apply gap-2 px-4 py-2;
+}
+
+.btn-padding-xl {
+  @apply gap-3 px-4 py-3;
+}
+
+.btn-rounded {
+  @apply rounded-md;
+}
+
+.btn-border {
+  @apply border dark:border-gray-400 border-gray-700;
+}
+
+.btn-success {
+  @apply bg-linear-to-b from-green-400 to-green-600 hover:from-green-500 hover:to-green-700;
+}
+
+.btn-warning {
+  @apply bg-linear-to-b from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700;
+}
+
+.btn-info {
+  @apply bg-linear-to-b from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700;
+}
+
+.btn-danger {
+  @apply bg-linear-to-b from-red-400 to-red-600 hover:from-red-500 hover:to-red-700;
+}
+
+.btn-gray {
+  @apply bg-linear-to-b dark:from-gray-700 dark:to-gray-900 dark:hover:from-gray-500 dark:hover:to-gray-700 from-gray-200 to-gray-400 hover:from-gray-300 hover:to-gray-600;
+}
+
+.btn-white {
+  @apply bg-linear-to-b dark:from-gray-200 dark:to-gray-400 dark:hover:from-gray-300 dark:hover:to-gray-500 from-gray-50 to-gray-100 hover:from-gray-300 hover:to-gray-600 text-black;
+}
+
+.btn-transparent {
+  @apply bg-transparent;
+}
+
+.btn-trans-success {
+  @apply text-green-400 hover:text-green-700;
+}
+
+.btn-trans-danger {
+  @apply text-red-400 hover:text-red-700;
+}
+
+.btn-trans-warning {
+  @apply text-amber-400 hover:text-amber-600;
+}
+
+.btn-trans-info {
+  @apply text-blue-400 hover:text-blue-700;
+}
+
+.count-header {
+  @apply col-span-4 uppercase font-bold text-center text-[15pt] p-0 w-full;
+}
+
+.count-border {
+  @apply border-gray-800 dark:border-gray-400 border-r-3 mt-2 mb-4 border-dotted;
+}
+
+.count-header-border {
+  @apply col-span-3 border-gray-800 dark:border-gray-400 border-b-3 mx-4 border-dotted;
+}
+
+.count-bg {
+  @apply p-0 grid grid-rows-2 bg-black dark:bg-white rounded-md border-0 border-gray-200 dark:border-gray-800 text-shadow-lg items-center dark:text-black text-white;
+}
+
+.count-only-bg {
+  @apply bg-gray-200 dark:bg-gray-800 rounded-md border-0 border-gray-600 dark:border-gray-800 p-1;
+}
+
+.count {
+  @apply font-extrabold text-[25pt] p-0 text-center font-(family-name:--digital-font);
+}
+
+.count-sub-heading {
+  @apply font-bold text-lg text-center;
+}
+
+.unit {
+  @apply font-extrabold text-[20pt] text-center content-center;
+}
+
+.section {
+  @apply border dark:border-gray-400 border-gray-800 border-dashed rounded m-2 p-3 relative;
+}
+
+.section-header {
+  @apply rounded text-center font-bold border dark:border-gray-400 border-gray-800 p-2 m-1 align-middle content-center;
+}
+
+.section-header-vertical {
+  @apply p-1;
+}
+
+.addvitals-input .p-inputnumber-input {
+  max-width: 100% !important;
+  width: 100% !important;
+  min-width: 100% !important;
+}
+
+.addvitals-input {
+  max-width: 100% !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  @apply flex;
+}
+
+.addvitals-input input {
+  border-right: 0px !important;
+}
+
+.addvitals-input .unit {
+  background: var(--surface-b);
+  color: var(--text-color-secondary);
+  border-top: 1px solid var(--surface-d);
+  border-right: 1px solid var(--surface-d);
+  border-bottom: 1px solid var(--surface-d);
+  border-left: 0px;
+  padding: 0.5rem;
+  min-width: 3rem;
+  font-size: 8pt;
+  text-wrap: none;
+  text-align: right;
+}
+
+.form-label-mini {
+  @apply text-sm mt-auto mb-auto text-center border px-2 py-1.5 min-w-15;
+}
+
+.vitals-label {
+  @apply font-bold w-full align-middle mb-2 text-left py-2;
+}
+
+.vitals-detail {
+  @apply font-normal border border-r-0 border-gray-500 dark:border-gray-400 text-center w-full py-1 content-center align-middle mb-2 pr-2;
+}
+
+.vitals-unit {
+  @apply flex justify-end-safe text-right text-xs border border-l-0 border-gray-500 dark:border-gray-400 pr-2 py-2 mb-2;
+}
+
+.form-label {
+  @apply w-full p-1.5 m-1;
+}
+
+.form-control {
+  @apply w-full m-1;
+}
+
+.form-error {
+  @apply bg-yellow-50 rounded-sm m-2 pl-5 text-red-600 text-left list-disc;
+}
+
+.form-select {
+  @apply w-full m-1;
+}
+
+.bg-danger td {
+  @apply bg-red-800;
+}
+
+.bg-pending td {
+  @apply bg-orange-300 text-black;
+}
+
+.gender-icons .male-icon {
+  @apply text-blue-500 dark:text-blue-300;
+}
+
+.gender-icons .female-icon {
+  @apply text-pink-500 dark:text-pink-300;
+}
+
+.gender-icons .trans-icon {
+  @apply text-purple-500 dark:text-purple-300;
+}
+
+.pending-gender-icons .male-icon {
+  @apply text-blue-600;
+}
+
+.pending-gender-icons .female-icon {
+  @apply text-pink-600;
+}
+
+.pending-gender-icons .trans-icon {
+  @apply text-purple-600;
+}

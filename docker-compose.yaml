@@ -1,0 +1,114 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "MyStrongPassword!123"
+      MSSQL_SA_USER: "sa"
+      MSSQL_PID: "Developer"
+    ports:
+      - 1433:1433
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "/opt/mssql-tools18/bin/sqlcmd",
+          "-S",
+          "localhost",
+          "-U",
+          "sa",
+          "-P",
+          "MyStrongPassword!123",
+          "-Q",
+          "SELECT 1",
+          "-No",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - app-network
+
+  webapi:
+    build:
+      context: ./RagWebApi-Tests
+      dockerfile: RagWebApi/Dockerfile
+    container_name: ragwebapi
+    restart: unless-stopped
+    ports:
+      - 6100:6100
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      ASPNETCORE_URLS: ${ASPNETCORE_URLS}
+      ASPNETCORE_USE_HTTP: ${ASPNETCORE_USE_HTTP}
+      DOTNET_RUNNING_IN_CONTAINER: ${DOTNET_RUNNING_IN_CONTAINER}
+      ConnectionStrings__DefaultConnection: Server=sqlserver;Database=${DBNAME};User Id=${DBUSER};Password=${DBPASSWORD};TrustServerCertificate=True;Encrypt=False
+      OPEN_ROUTER_KEY: ${OPEN_ROUTER_KEY}
+      CLOUD_FLARE_KEY: ${CLOUD_FLARE_KEY}
+      JINA_KEY: ${JINA_KEY}
+
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    volumes:
+      - ./RagWebApi-Tests:/src
+      - RagWebApi_debug:/root/.nuget/packages
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6100/health"]
+      interval: 30s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  frontend:
+    build:
+      context: ./RagClient
+      dockerfile: Dockerfile
+    container_name: RagClient-frontend
+    ports:
+      - 3100:80
+    depends_on:
+      webapi:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - ./RagClient/src:/app/src
+      - ./RagClient/public:/app/public
+      - RagClient_node_modules:/app/node_modules
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  sqlserver_data:
+    driver: local
+  RagClient_node_modules:
+    driver: local
+  RagWebApi_debug:
+    driver: local

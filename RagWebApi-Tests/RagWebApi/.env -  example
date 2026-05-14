@@ -1,0 +1,9 @@
+﻿
+# DATABASE PROPERTIES
+DATABASE=RagContext
+DBSERVER=<Server Name For DB>
+
+# AI KEYS
+JinaKey=<Your Jina Api Key>
+OpenRouterKey=< Your Open Router Api Key>
+CloudFlareKey=<Your CloudFlare Api Token>

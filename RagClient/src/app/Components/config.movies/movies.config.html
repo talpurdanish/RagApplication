@@ -1,0 +1,92 @@
+<div class="w-full mb-4 flex mx-1">
+  <div class="flex flex-1">
+    <form [formRoot]="weightsForm" class="border rounded m-2 p-2 border-gray-600 flex-1">
+      <div class="border rounded p-2 border-gray-600 text-center font-bold">
+        Serch Query Weights
+      </div>
+      <div class="flex gap-0 flex-wrap">
+        @for (field of fieldDefs(); track $index) {
+          @let formField = $any(weightsForm)[field.name];
+          <div class="flex flex-col w-1/4 p-1">
+            <span class="font-bold flex-2/5 mb-1">{{ field.label }}:</span>
+            <input
+              type="number"
+              class="border border-gray-600 p-1 flex-3/5"
+              [formField]="formField"
+              (change)="onWeightsChanged()"
+              step="0.01"
+            />
+          </div>
+        }
+      </div>
+      <div class="flex gap-1">
+        <span class="font-bold p-2">TOTAL :</span>
+        <span
+          class="border border-gray-600 p-2 flex-1"
+          [class]="weightsTotal() > 1 ? 'text-red-500' : 'text-black dark:text-white'"
+          >{{ weightsTotal() | number: '1.2-2' }}</span
+        >
+        <button
+          class="btn btn-warning btn-padding-md btn-rounded flex-1 text-center items-center justify-center font-bold"
+          type="submit"
+        >
+          Save Weights
+        </button>
+      </div>
+    </form>
+  </div>
+  <div class="flex justify-center items-center-safe flex-col">
+    <div class="p-1 m-1 flex flex-col flex-wrap">
+      @for (aType of analysisTypes; track $index) {
+        <a
+          class="flex p-0.5 gap-0.5 cursor-pointer"
+          [class]="
+            selectedType() == aType.value
+              ? 'border bg-amber-600 dark:bg-amber-400 text-white dark:text-black'
+              : 'dark:text-white text-black border border-gray-600'
+          "
+          (click)="selectedType.set(aType.value)"
+        >
+          <input
+            type="radio"
+            [value]="aType.value"
+            name="analysisTypes"
+            [checked]="selectedType() == aType.value"
+            hidden
+          />
+          <span class="flex-1 p-1.5">{{ aType.name }}</span>
+        </a>
+      }
+    </div>
+
+    <button
+      class="btn btn-warning btn-padding-md btn-rounded mx-auto"
+      type="button"
+      (click)="startAnalysis()"
+    >
+      Start Analysis
+    </button>
+  </div>
+  <div class="flex flex-1">
+    <form [formRoot]="uploadForm" class="border rounded m-2 p-2 border-gray-600 flex-1">
+      <div class="border rounded p-2 border-gray-600 text-center font-bold">
+        Upload Single Movie
+      </div>
+      <input
+        class="border rounded-sm w-full p-1.5 m-1"
+        type="file"
+        (change)="onFileSelected($event)"
+      />
+      <button
+        class="btn btn-warning btn-padding-md btn-rounded mx-auto"
+        type="submit"
+        [disabled]="singleInProcess()"
+      >
+        Upload
+      </button>
+      @if (singleInProcess()) {
+        <app-progress />
+      }
+    </form>
+  </div>
+</div>

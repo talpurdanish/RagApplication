@@ -1,0 +1,51 @@
+<div class="p-2">
+  <div class="flex my-2 btn-warning rounded text-black">
+    <div class="flex-1 rounded-tl rounded-bl p-2 text-center font-bold">Generate Images</div>
+  </div>
+  <div class="flex mb-0">
+    <input
+      [value]="searchText()"
+      name="search"
+      class="flex-1 border border-gray-200 dark:border-gray-600 p-2 outline-0 rounded-tl rounded-bl"
+      (keydown)="inputChanged($event.target)"
+      (keydown.enter)="generateImage()"
+      placeholder="Enter text to generate image.."
+    />
+    @if (models.length > 0) {
+      <select
+        [value]="selectedModel()"
+        (change)="onSelectChange($event)"
+        class="p-2 border border-gray-200 dark:border-gray-600 border-l-0 cursor-pointer"
+      >
+        @for (opt of models; track $index) {
+          <option [value]="opt">{{ opt }}</option>
+        }
+      </select>
+    }
+    <button
+      class="p-2 border border-gray-200 dark:border-gray-600 border-l-0 cursor-pointer hover:text-amber-500"
+      (click)="generateImage()"
+    >
+      <ng-icon name="lucideSearch"></ng-icon>
+    </button>
+    <button
+      class="p-2 border border-gray-200 dark:border-gray-600 border-l-0 cursor-pointer hover:text-amber-500 rounded-tr rounded-br"
+      (click)="reset()"
+    >
+      <ng-icon name="lucideX"></ng-icon>
+    </button>
+  </div>
+  @if (loading()) {
+    <app-progress />
+  }
+
+  @if (imageResponseRecieved()) {
+    <div class="mt-2 border border-gray-600 p-2 flex-1 rounded overflow-hidden relative">
+      @if (imageUrl() != null) {
+        <img [src]="imageUrl()" class="w-full h-full object-contain" />
+      } @else {
+        <p>No Images are generated</p>
+      }
+    </div>
+  }
+</div>

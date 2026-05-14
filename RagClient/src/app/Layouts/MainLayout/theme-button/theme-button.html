@@ -1,0 +1,16 @@
+<div class="flex">
+  <button
+    class="flex-1 btn btn-padding-md content-center flex rounded-tl rounded-bl border border-gray-600"
+    [class]="{ 'btn-warning': isDark, 'btn-transparent': !isDark }"
+    (click)="setDark()"
+  >
+    <ng-icon name="lucideMoon" size="16" class="mx-auto"></ng-icon>
+  </button>
+  <button
+    class="flex-1 btn btn-padding-md content-center flex rounded-tr rounded-br border border-gray-600 border-l-0"
+    [class]="{ 'btn-warning': !isDark, 'btn-transparent': isDark }"
+    (click)="setLight()"
+  >
+    <ng-icon name="lucideSun" size="16" class="mx-auto"></ng-icon>
+  </button>
+</div>

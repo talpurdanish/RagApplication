@@ -1,0 +1,114 @@
+<div class="menu-container">
+  <div
+    class="w-full text-center align-middle mb-4"
+    [class]="{ 'h-[40PX]': collapsed, 'h-[200px]': !collapsed }"
+  >
+    <img
+      src="../../../../assets/images/fmdclogo.png"
+      alt="Federal Medical and Dental Clinic"
+      class="mx-auto object-cover h-full my-2"
+    />
+  </div>
+
+  @if (!collapsed) {
+    <div class="max-h-120 overflow-y-auto scrollbar-hide">
+      <ul class="menu">
+        @for (item of menuItems; track $index) {
+          <li [class.toggle]="openIndicesHas($index)">
+            @if (item.items != null) {
+              <a
+                (click)="toggleAccordion($index)"
+                class="flex items-center justify-between"
+                [class.active]="activeItem() == item.link"
+              >
+                <span class="flex items-center gap-2 flex-1">
+                  <ng-icon [svg]="item.icon" [size]="iconSize()" class="pr-2"></ng-icon>
+                  {{ item.title }}
+                </span>
+                <span
+                  class="transition-transform duration-300 ease-in-out"
+                  [class]="{
+                    'rotate-90': openIndicesHas($index),
+                    'rotate-0': !openIndicesHas($index),
+                  }"
+                >
+                  <ng-icon name="lucideChevronRight"></ng-icon>
+                </span>
+              </a>
+              <ul
+                class="transition-all duration-300 ease-in-out overflow-hidden sub-menu"
+                [class.max-h-full]="openIndicesHas($index)"
+                [class.max-h-0]="!openIndicesHas($index)"
+              >
+                @for (subItem of item.items; track $index) {
+                  <li>
+                    <a
+                      (click)="navigateToHref(subItem.link)"
+                      [class.active]="activeItem() == subItem.link"
+                      class="flex gap-2"
+                    >
+                      <ng-icon [svg]="subItem.icon" [size]="iconSize()"></ng-icon>
+                      {{ subItem.title }}
+                    </a>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <a
+                (click)="navigateToHref(item.link)"
+                [class.active]="activeItem() == item.link"
+                class="flex gap-2"
+              >
+                <ng-icon [svg]="item.icon" [size]="iconSize()"></ng-icon>
+                {{ item.title }}
+              </a>
+            }
+          </li>
+        }
+      </ul>
+    </div>
+  } @else {
+    <div>
+      <ul class="menu">
+        @for (item of menuItems; track $index) {
+          <li class="relative group">
+            @if (item.items != null) {
+              <a
+                class="flex items-center justify-center p-3 tooltip-icon transition-colors duration-200"
+              >
+                <ng-icon [svg]="item.icon" [size]="iconSize()" class="pr-2"></ng-icon>
+                <ng-icon name="lucideChevronRight" class="w-3 h-3 ml-1 absolute right-0"></ng-icon>
+              </a>
+              <ul
+                class="sub-menu-collapsed absolute left-full top-0 ml-2 w-56 z-50 shadow-lg rounded-tr rounded-br opacity-0 translate-y-2 pointer-events-none transition-all duration-300 ease-in-out group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto"
+                [class.max-h-full]="openIndicesHas($index)"
+                [class.max-h-0]="!openIndicesHas($index)"
+              >
+                @for (subItem of item.items; track $index) {
+                  <li>
+                    <a
+                      (click)="navigateToHref(subItem.link)"
+                      [class.active]="activeItem() == subItem.link"
+                      class="flex items-center gap-2 p-2 transition-colors duration-200"
+                    >
+                      <ng-icon [svg]="subItem.icon" [size]="iconSize()"></ng-icon>
+                      {{ subItem.title }}
+                    </a>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <a
+                (click)="navigateToHref(item.link)"
+                [class.active]="activeItem() == item.link"
+                class="flex items-center justify-center p-3 tooltip-icon transition-colors duration-200"
+              >
+                <ng-icon [svg]="item.icon" [size]="iconSize()"></ng-icon>
+              </a>
+            }
+          </li>
+        }
+      </ul>
+    </div>
+  }
+</div>

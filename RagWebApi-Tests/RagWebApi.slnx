@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".dockerignore" />
+  </Folder>
+  <Project Path="RagWebApi.UnitTests/RagWebApi.UnitTests.csproj" Id="fea86946-9e61-4b52-9968-2e637e097869" />
+  <Project Path="RagWebApi/RagWebApi.csproj" />
+</Solution>

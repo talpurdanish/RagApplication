@@ -1,0 +1,178 @@
+<div class="flex p-2 flex-col">
+  <div class="w-full mb-4 flex p-2 gap-2">
+    <form [formRoot]="multiUploadForm" class="border rounded border-gray-600 flex-1">
+      <div class="btn-warning rounded-tl rounded-tr p-2 text-center font-bold">
+        Upload Multiple Images
+      </div>
+      <div class="p-2 gap-1 flex flex-col">
+        <input
+          class="border rounded-sm w-full p-1.5"
+          type="file"
+          multiple
+          (change)="onFileSelected($event, false)"
+        />
+        <button
+          class="btn btn-warning btn-padding-md btn-rounded mx-auto"
+          type="submit"
+          [disabled]="multiInProcess()"
+        >
+          Multi Upload
+        </button>
+
+        @if (multiInProcess()) {
+          <app-progress />
+        }
+      </div>
+    </form>
+    <div class="flex justify-center items-center-safe">
+      <button
+        class="btn btn-success btn-padding-md btn-rounded mx-auto"
+        type="button"
+        (click)="startAnalysis()"
+      >
+        Start Analysis
+      </button>
+    </div>
+    <form [formRoot]="uploadForm" class="border rounded border-gray-600 flex-1">
+      <div class="btn-warning rounded-tl rounded-tr p-2 text-center font-bold">
+        Upload Single Images
+      </div>
+      <div class="p-2 gap-1 flex flex-col">
+        <input
+          class="border rounded-sm w-full p-1.5"
+          type="file"
+          multiple
+          (change)="onFileSelected($event, true)"
+        />
+        <button
+          class="btn btn-warning btn-padding-md btn-rounded mx-auto"
+          type="submit"
+          [disabled]="singleInProcess()"
+        >
+          Single Upload
+        </button>
+
+        @if (singleInProcess()) {
+          <app-progress />
+        }
+      </div>
+    </form>
+  </div>
+
+  <div class="flex mb-0 btn-warning rounded">
+    <div class="flex-1 rounded-tl rounded-bl p-2 text-center font-bold">Images</div>
+    <div class="flex">
+      <input
+        #searchText
+        name="search"
+        class="flex-1 p-2 outline-0 bg-white/50 text-black"
+        (change)="inputChanged()"
+        (keydown.enter)="search(searchText.value)"
+        placeholder="Enter text to search..."
+      />
+
+      <button
+        class="p-2 border-l border-amber-300 cursor-pointer hover:text-amber-800"
+        (click)="search(searchText.value)"
+      >
+        <ng-icon name="lucideSearch"></ng-icon>
+      </button>
+      <button
+        class="p-2 border-l border-amber-300 cursor-pointer hover:text-amber-800"
+        (click)="reset()"
+      >
+        <ng-icon name="lucideX"></ng-icon>
+      </button>
+    </div>
+    <button
+      class="p-2 rounded-tr rounded-br border-l border-amber-300 cursor-pointer hover:text-amber-800"
+      (click)="loadImages()"
+    >
+      <ng-icon name="lucideRefreshCcw"></ng-icon>
+    </button>
+  </div>
+  @if (searchInProgress() || loading()) {
+    <app-progress />
+  }
+
+  @if (insight() != '') {
+    <div class="w-full my-2 border rounded p-2 border-gray-600 text-center font-bold">
+      {{ insight() }}
+    </div>
+  }
+  <div class="grid grid-cols-6 justify-start gap-1 mt-2">
+    @if (list().length > 0) {
+      @for (image of list(); track $index) {
+        <div
+          class="cursor-pointer group border border-gray-600 p-1 max-h-[150px] overflow-hidden relative bg-black/40 rounded object-cover transition-transform duration-500 group-hover:scale-110"
+        >
+          <img [src]="image.image" class="w-full h-full object-scale-down" />
+          @if (searched()) {
+            <p class="absolute bottom-1 right-1 text-red-500 text-bold bg-black p-1">
+              {{ image.similarity | number: '1.2-2' }}
+            </p>
+          }
+
+          @if (image.inProgress) {
+            <app-progress />
+          }
+          <div
+            class="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded"
+          >
+            <div class="flex m-auto gap-1">
+              <a
+                class="cursor-pointer px-2 py-1 bg-black/20 border border-gray-700 hover:bg-amber-500/50 rounded-lg items-center justify-center"
+                (click)="getInsight(image)"
+              >
+                <ng-icon name="lucideInfo" size="18" class="my-auto"></ng-icon>
+              </a>
+              <a
+                (click)="showImage(image, $index)"
+                class="cursor-pointer px-2 py-1 bg-black/20 border border-gray-700 hover:bg-amber-500/50 rounded-lg items-center justify-center"
+              >
+                <ng-icon name="lucideEye" size="20" class="my-auto"></ng-icon>
+              </a>
+            </div>
+          </div>
+        </div>
+      }
+    } @else {
+      <p>No Images are available</p>
+    }
+  </div>
+  @if (imageClicked() && selectedImage()) {
+    <div class="absolute left-0 top-0 w-full h-full backdrop-blur-lg inset-0 p-4 bg-black/30">
+      <div class="p-4 relative w-full h-full mx-auto">
+        <img [src]="selectedImage()" class="object-contain w-full h-full p-4 rounded" />
+        <button
+          class="w-10 h-10 absolute -top-2 -right-2 bg-black/50 border border-gray-700 disabled:bg-gray-200 shadow-2xl dark:shadow-gray-300 shadow-gray-900 rounded-full font-bold cursor-pointer text-red-500 justify-center items-center"
+          (click)="closeImage()"
+        >
+          <ng-icon name="lucideX" color="red" size="24" strokeWidth="2" class="m-auto"></ng-icon>
+        </button>
+        <button
+          class="w-10 h-10 absolute bottom-1/2 -left-1 -translate-y-1/2 bg-black disabled:bg-gray-200 m-auto shadow-2xl dark:shadow-gray-300 shadow-gray-900 rounded-full font-bold cursor-pointer text-white justify-center items-center"
+          (click)="showPrev()"
+          [disabled]="!hasPrev()"
+        >
+          <ng-icon name="lucideArrowLeft" color="white" size="24" strokeWidth="2"></ng-icon>
+        </button>
+        <button
+          class="w-10 h-10 absolute bottom-1/2 -right-1 -translate-y-1/2 bg-black disabled:bg-gray-200 m-auto shadow-2xl dark:shadow-gray-300 shadow-gray-900 rounded-full font-bold cursor-pointer text-white justify-center items-center"
+          (click)="showNext()"
+          [disabled]="!hasNext()"
+        >
+          <ng-icon name="lucideArrowRight" color="white" size="24" strokeWidth="2"></ng-icon>
+        </button>
+        <div
+          class="flex absolute bottom-10 left-1/2 -translate-x-1/2 p-3 rounded font-bold cursor-pointer bg-black/50 w-[60%] mx-auto"
+        >
+          <div class="flex-1">
+            {{ selectedAiInsight() }}
+          </div>
+          <div>{{ currentIndex() + 1 }}/{{ total() }}</div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

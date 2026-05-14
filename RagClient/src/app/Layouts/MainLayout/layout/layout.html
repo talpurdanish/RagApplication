@@ -1,0 +1,23 @@
+<div class="flex h-screen w-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+  <aside
+    class="transition-all duration-300 ease-in-out w-64 bg-gray-100 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"
+    [class]="{ 'w-20': collapsed, 'w-64': !collapsed }"
+  >
+    <app-sidebar [collapsed]="collapsed" />
+  </aside>
+  <div class="flex flex-col flex-1 overflow-hidden">
+    <header
+      class="h-16 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4"
+    >
+      <app-header (collapseMenuCall)="collapseMenu($event)" [collapsed]="collapsed" />
+    </header>
+    <main class="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900">
+      <router-outlet></router-outlet>
+    </main>
+    <footer
+      class="h-12 bg-gray-100 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-700 flex items-center justify-center text-sm"
+    >
+      <app-footer />
+    </footer>
+  </div>
+</div>

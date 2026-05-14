@@ -1,0 +1,45 @@
+<div class="gap-2 items-stretch">
+  <div
+    class="w-full border rounded p-2 border-gray-600 text-center font-bold btn-warning text-black mb-2"
+  >
+    Documents Operations
+  </div>
+  <form [formRoot]="uploadForm" class="flex gap-1">
+    <input class="flex-1 border rounded-sm p-2" type="file" (change)="onFileChange($event)" />
+    <button class="btn btn-warning btn-padding-md btn-rounded" type="submit">Upload</button>
+    <button
+      class="btn btn-success btn-padding-md btn-rounded mx-auto"
+      type="button"
+      (click)="startAnalysis()"
+    >
+      Start Analysis
+    </button>
+  </form>
+  @if (inProcess()) {
+    <app-progress />
+  }
+  <div class="flex my-2 btn-warning rounded text-black">
+    <div class="flex-1 rounded-tl rounded-bl p-2 text-center font-bold">Documents</div>
+
+    <button
+      class="p-2 rounded-tr rounded-br border-yellow-200 dark:border-yellow-400 border-l cursor-pointer"
+      (click)="loadDocuments()"
+    >
+      <ng-icon name="lucideRefreshCcw"></ng-icon>
+    </button>
+  </div>
+  <div class="flex gap-1 flex-col max-h-100 overflow-y-auto scrollbar-hide">
+    @for (doc of list(); track $index) {
+      <div class="w-full flex flex-col border border-gray-600 rounded p-1">
+        <div class="w-full flex">
+          <div class="font-bold">Title:</div>
+          <div class="flex-1">{{ doc.title }}</div>
+        </div>
+        <div class="w-full flex">
+          <div class="font-bold">Author:</div>
+          <div class="flex-1">{{ doc.author }}</div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

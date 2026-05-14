@@ -1,0 +1,130 @@
+<div class="w-full gap-2">
+  <!-- Heading Start -->
+  <div class="flex mb-1 btn-warning rounded text-black">
+    <div class="flex-1 rounded-tl rounded-bl p-2 text-center font-bold">Movies</div>
+    <button class="p-2 border-0 rounded-tr rounded-br cursor-pointer" (click)="loadMovies()">
+      <ng-icon name="lucideRefreshCcw"></ng-icon>
+    </button>
+  </div>
+
+  <!-- Heading End and Search Form Start-->
+  <div class="flex mb-0 border border-gray-600 rounded">
+    <input
+      #searchText
+      name="search"
+      class="flex-1 p-2 outline-0 rounded-tl rounded-bl"
+      (change)="inputChanged()"
+      (keydown.enter)="search(searchText.value)"
+      placeholder="Enter text to search..."
+    />
+    <div class="flex">
+      @for (aType of analysisTypes; track $index) {
+        <a
+          class="cursor-pointer p-2 border-l border-gray-600"
+          [class]="
+            selectedType() == aType.value
+              ? 'bg-amber-600 dark:bg-amber-400 text-white dark:text-black'
+              : 'dark:text-white text-black'
+          "
+          (click)="selectedType.set(aType.value)"
+        >
+          <input
+            type="radio"
+            [value]="aType.value"
+            name="analysisTypes"
+            [checked]="selectedType() == aType.value"
+            hidden
+          />
+          {{ aType.name }}
+        </a>
+      }
+    </div>
+    <button
+      class="p-2 border-l border-gray-600 cursor-pointer hover:text-amber-500"
+      (click)="search(searchText.value)"
+    >
+      <ng-icon name="lucideSearch"></ng-icon>
+    </button>
+    <button
+      class="p-2 border-l border-gray-600 cursor-pointer hover:text-amber-500 rounded-tr rounded-br"
+      (click)="reset()"
+    >
+      <ng-icon name="lucideX"></ng-icon>
+    </button>
+  </div>
+  @if (searchInProgress() || loading()) {
+    <app-progress />
+  }
+  <!-- Search Form End and List Start -->
+  <div class="flex flex-wrap justify-start gap-1 my-1">
+    @if (list() != null && list().currentPage <= list().totalPages && list().totalRecords > 0) {
+      @for (movie of list().movies; track $index) {
+        <div
+          class="border border-gray-600 p-2 flex-1/4 max-w-[33%] overflow-hidden relative rounded"
+        >
+          <div class="cursor-pointer w-full h-full overflow-hidden">
+            <div class="flex-1 gap-1">
+              <span class="font-bold">Title:</span>
+              {{ movie.title }}
+            </div>
+
+            <div class="flex-1 gap-1">
+              <span class="font-bold">Casts:</span>
+              {{ movie.actorsString }}
+            </div>
+
+            <div class="flex-1 gap-1">
+              <span class="font-bold">Keywords:</span>
+              {{ movie.keywordsString }}
+            </div>
+          </div>
+          @if (searched()) {
+            <p class="absolute bottom-1 right-1 text-red-500 text-bold bg-black p-1">
+              {{ movie.similarity | number: '1.5-5' }}
+            </p>
+          }
+        </div>
+      }
+    } @else {
+      <p class="p-2">No Movies are available</p>
+    }
+  </div>
+  <!-- List End and Paging Start -->
+  @if (
+    list() != null && list().totalRecords != null && list().totalRecords > 0 && !this.searched()
+  ) {
+    <div class="w-[75%] border dark:border-gray-600 border-gray-200 mx-auto">
+      <div class="flex gap-[0.5] ms-auto text-center">
+        @for (page of firstChunkPages(); track $index) {
+          <a
+            (click)="updatePage(page)"
+            class="border border-gray-600 flex-1 p-2 m-1 cursor-pointer hover:dark:bg-amber-300 hover:bg-amber-600 hover:dark:text-black hover:text-white"
+            [class]="page == list().currentPage ? 'bg-amber-400 text-black font-bold' : ''"
+            >{{ page }}</a
+          >
+        }
+        <p class="p-1 m-1">...</p>
+        @if (list().currentPage >= 10) {
+          @for (page of middleChunkPages(); track $index) {
+            <a
+              (click)="updatePage(page)"
+              class="border border-gray-600 flex-1 p-2 m-1 cursor-pointer hover:dark:bg-amber-300 hover:bg-amber-600 hover:dark:text-black hover:text-white"
+              [class]="page == list().currentPage ? 'bg-amber-400 text-black font-bold' : ''"
+              >{{ page }}</a
+            >
+          }
+          <p class="p-1 m-1">...</p>
+        }
+        @for (page of lastChunkPages(); track $index) {
+          <a
+            (click)="updatePage(page)"
+            class="border border-gray-600 flex-1 p-2 m-1 hover:dark:bg-amber-300 hover:bg-amber-600 hover:dark:text-black hover:text-white cursor-pointer"
+            [class]="page == list().currentPage ? 'bg-amber-400 text-black font-bold' : ''"
+            >{{ page }}</a
+          >
+        }
+      </div>
+    </div>
+  }
+  <!-- Paging End -->
+</div>

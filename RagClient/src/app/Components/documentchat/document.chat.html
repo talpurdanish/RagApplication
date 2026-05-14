@@ -1,0 +1,73 @@
+<div class="flex flex-col border border-gray-600 rounded items-stretch relative w-full h-full">
+  <!-- Chat Window -->
+  <div class="flex-1 overflow-y-auto p-4 space-y-4 max-h-120 w-full" #chatWindow>
+    @for (msg of messages(); track $index) {
+      <div
+        class="flex text-justify"
+        [class]="msg.type == 'user' ? 'items-start flex-row-reverse' : 'items-end flex-row'"
+      >
+        <!-- Circle Avatar -->
+        <div
+          class="shrink-0 w-8 h-8 flex items-center justify-center rounded-full mr-2 my-auto"
+          [class]="
+            msg.type == 'user'
+              ? 'bg-blue-500 dark:bg-blue-200 text-white dark:text-black ml-2'
+              : 'bg-gray-400 dark:bg-gray-600 text-white mr-2'
+          "
+        >
+          <ng-icon [name]="msg.type == 'user' ? 'lucideUser2' : 'lucideBot'"></ng-icon>
+        </div>
+
+        <!-- Message Bubble -->
+        <div
+          class="px-4 py-2 rounded-lg max-w-3xl"
+          [class]="
+            msg.type == 'user'
+              ? 'bg-blue-500 dark:bg-blue-200 text-white dark:text-black'
+              : msg.type == 'ai' && msg.isError
+                ? 'bg-red-200 text-red-700'
+                : 'bg-gray-200 dark:bg-gray-800 text-black dark:text-white'
+          "
+        >
+          {{ msg.message }}
+
+          @if (msg.type == 'ai' && msg.time != '' && !msg.isError) {
+            <p class="rounded p-1 text-xs text-red-700 dark:text-red-500 font-bold">
+              (Replied in {{ msg.time }} secs)
+            </p>
+          }
+        </div>
+      </div>
+    }
+  </div>
+  <!-- Input Box -->
+  <div class="p-1 px-4 flex items-center rounded absolute bottom-0 w-full mx-auto mb-1 left-0">
+    <input
+      type="text"
+      [value]="searchText()"
+      placeholder="Type a message..."
+      class="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      (change)="searchText.set($event.target.value)"
+      (keydown)="searchText.set($event.target.value)"
+      (keydown.enter)="search()"
+    />
+    <button
+      class="ml-2 px-4 py-2 btn btn-success btn-rounded"
+      (click)="search()"
+      [disabled]="isRunning() || searchText() == ''"
+    >
+      @if (isRunning()) {
+        {{ displayTime() }}
+      } @else {
+        Send
+      }
+    </button>
+    <button
+      class="ml-2 px-2 py-3 btn btn-danger btn-rounded"
+      (click)="reset()"
+      [disabled]="isRunning()"
+    >
+      <ng-icon name="lucideX"></ng-icon>
+    </button>
+  </div>
+</div>
