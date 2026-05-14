@@ -9,22 +9,41 @@ jobs:
     runs-on: [self-hosted, webapi]
     steps:
       - uses: actions/checkout@v3
-      - name: Build webapi Docker Image
-        run: docker build -t ragwebapi:latest -f RagWebApi-Tests/RagWebApi/Dockerfile .
+      - name: 🛠️ Build WebAPI Docker Image
+        run: |
+          echo "=== Building WebAPI Docker Image ==="
+          docker build --progress=plain -t ragwebapi:latest -f RagWebApi-Tests/RagWebApi/Dockerfile .
+          echo "✅ WebAPI image built successfully"
 
   build-client:
     runs-on: [self-hosted, client]
     steps:
       - uses: actions/checkout@v3
-      - name: Build Rag Client Docker Image
-        run: docker build -t RagClient-frontend:latest -f RagClient/Dockerfile .
+      - name: 🎨 Build Rag Client Docker Image
+        run: |
+          echo "=== Building Client Docker Image ==="
+          docker build --progress=plain -t RagClient-frontend:latest -f RagClient/Dockerfile .
+          echo "✅ Client image built successfully"
 
   deploy:
     runs-on: [self-hosted, docker]
     needs: [build-webapi, build-client]
     steps:
       - uses: actions/checkout@v3
-      - name: Check Docker Version
-        run: docker --Version
-      - name: Start Containers of Docker Compose
-        run: docker-compose up -d
+      - name: 🔍 Check Docker Version
+        run: |
+          echo "=== Checking Docker Version ==="
+          docker --version
+      - name: 🚀 Start Containers with Docker Compose
+        run: |
+          echo "=== Starting Docker Compose Deployment ==="
+          docker-compose up -d
+          echo "✅ Containers started"
+      - name: 📋 Show Running Containers
+        run: |
+          echo "=== Listing Running Containers ==="
+          docker ps
+      - name: 📜 Tail Logs for Progress
+        run: |
+          echo "=== Streaming Logs for Progress ==="
+          docker-compose logs --tail=50 --follow

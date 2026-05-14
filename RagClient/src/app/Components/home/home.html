@@ -9,34 +9,66 @@
     All three modules, Documents, Images and Movies have a start Analysis button that start the
     calculation of float Embeddings.
   </p>
-  <div class="flex">
+  <div class="flex text-justify">
     <div class="p-2 m-2 rounded border border-gray-600 flex-1">
-      <h1 class="p-2 underline capitalize">Images:</h1>
+      <h1 class="p-2 btn-warning uppercase font-bold w-full text-center text-xl">Images</h1>
       <p class="ml-2">There are two pages of images</p>
       <ul class="ml-8 list-disc">
-        <li>Images Insertion and List</li>
+        <li>Images Insertion, List and Semantic Search</li>
         <li>Generate Images</li>
       </ul>
-      <h2 class="p-2 underline capitalize">Images Insertion and List:</h2>
+      <h2 class="p-2 underline uppercase font-bold">Images Insertion, List and Semantic Search:</h2>
       <p class="ml-2">
         This module provides options to insert images in database, start image embeddings and image
         insight embeddings after insertion and display the list of images. This module also has
-        options to display images in slideshow and get insight of individual image on click.
+        options to display images in slideshow and get insight of individual image on click. This
+        module aslo has search functionality, which first computes the similarity of images against
+        the query and display the relevant images.
       </p>
-      <h2 class="p-2 underline capitalize">Images Generation:</h2>
+      <h2 class="p-2 underline uppercase font-bold">Images Generation:</h2>
       <p class="ml-2">With this module image can be generated based on prompt entered</p>
     </div>
     <div class="p-2 m-2 rounded border border-gray-600 flex-1">
-      <h1 class="p-2 underline capitalize">Documents:</h1>
+      <h1 class="p-2 btn-warning uppercase font-bold w-full text-center text-xl">Documents</h1>
       <p class="ml-2">There are two pages of Documents</p>
       <ul class="ml-8 list-disc">
         <li>Document Insertion and List</li>
         <li>Chat Bot</li>
       </ul>
-      <h2 class="p-2 underline capitalize">Document Insertion and List:</h2>
+      <h2 class="p-2 underline uppercase font-bold">Document Insertion and List:</h2>
       <p class="ml-2">
         This module provides options to insert documents in database, start document embeddings
         after insertion and display the list of documents.
+      </p>
+      <h2 class="p-2 underline uppercase font-bold">Chat Bot:</h2>
+      <p class="ml-2">
+        This module first computes the similarity of all the documents against the query and then
+        sends the user query alongwith previous messages and the searched documents to openrouter to
+        get the answer of that query.
+      </p>
+    </div>
+    <div class="p-2 m-2 rounded border border-gray-600 flex-1">
+      <h1 class="p-2 btn-warning uppercase font-bold w-full text-center text-xl">Movies</h1>
+      <p class="ml-2">There are two pages of Movies</p>
+      <ul class="ml-8 list-disc">
+        <li>Movies List, Paging and Semantic Search</li>
+        <li>Config Movies</li>
+      </ul>
+      <h2 class="p-2 underline uppercase font-bold">Movies List, Paging and Semantic Search:</h2>
+      <p class="ml-2">
+        This module provides displays all the movies pagwise. This module also provides a way to
+        search the movies. it first computes the similarity of movies against user query and then
+        displays the list of relevant movies. There are two types of search, in one type similarity
+        is computed on seperate embedding of all the fields and then results are computed against
+        weight of each field while in other type similarity if computed for embeddings of movie
+        against a single combined string detail.
+      </p>
+
+      <h2 class="p-2 underline uppercase font-bold">Config Movies:</h2>
+      <p class="ml-2">
+        This module gives options to update the weights of different fields in search, options for
+        inserting the movies in database and option for starting the calculation of Movie
+        Embeddings.
       </p>
     </div>
   </div>
