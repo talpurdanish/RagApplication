@@ -17,6 +17,8 @@ import {
   lucideImages,
   lucideVideotape,
   lucideFileSearch2,
+  lucideBot,
+  lucideClipboardCheck,
 } from '@ng-icons/lucide';
 import { RouterPaths } from '../../../RouterPaths';
 import { Constants, Role, Roles } from '../../../BussinessLogic/Helpers/Constants';
@@ -134,6 +136,18 @@ export class Sidebar implements OnInit {
           title: 'Documents Chat',
           link: RouterPaths.documentsChat,
           tooltip: 'Documents Chat',
+        },
+      ],
+    },
+    {
+      icon: lucideBot,
+      title: 'Agents',
+      items: [
+        {
+          icon: lucideClipboardCheck,
+          title: 'Tasks',
+          link: RouterPaths.agents,
+          tooltip: 'Task Agent',
         },
       ],
     },

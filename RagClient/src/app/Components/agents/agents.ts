@@ -1,33 +1,28 @@
-import {
-  AfterViewChecked,
-  Component,
-  computed,
-  ElementRef,
-  OnInit,
-  signal,
-  ViewChild,
-} from '@angular/core';
-import { DocumentService } from '../../BussinessLogic/Services/Document.Service';
-import { ApiResponse } from '../../BussinessLogic/Models/Generics/ApiResponse';
+import { Component, computed, ElementRef, signal, ViewChild } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideBot, lucideSend, lucideUser2, lucideX } from '@ng-icons/lucide';
-
-import { Constants } from '../../BussinessLogic/Helpers/Constants';
+import { lucideSend, lucideX, lucideUser2, lucideBot } from '@ng-icons/lucide';
+import {
+  AgentService,
+  createTask,
+  TaskResponse,
+} from '../../BussinessLogic/Services/Agent.Service';
+import { ApiResponse } from '../../BussinessLogic/Models/Generics/ApiResponse';
 import { StorageService } from '../../BussinessLogic/Services/Storage.Service';
+import { Constants } from '../../BussinessLogic/Helpers/Constants';
 
 @Component({
-  selector: 'app-document',
+  selector: 'app-agents',
   imports: [NgIcon],
-  providers: [DocumentService, NgIcon],
+  providers: [AgentService, NgIcon],
   viewProviders: [provideIcons({ lucideSend, lucideX, lucideUser2, lucideBot })],
-  templateUrl: './document.chat.html',
-  styleUrl: './document.chat.css',
+  templateUrl: './agents.html',
+  styleUrl: './agents.css',
 })
-export class DocumentChatComponent implements OnInit, AfterViewChecked {
+export class AgentsComponent {
   @ViewChild('chatWindow') chatWindow!: ElementRef<HTMLDivElement>;
   searchText = signal<string>('');
+  sessionId = signal<string>('');
 
-  previousMessages = signal<string[]>([]);
   messages = signal<Message[]>([]);
 
   time = signal(0.0);
@@ -55,16 +50,18 @@ export class DocumentChatComponent implements OnInit, AfterViewChecked {
   }
 
   constructor(
-    private documentService: DocumentService,
+    private agentService: AgentService,
     private storageService: StorageService,
   ) {}
 
   ngOnInit(): void {
-    const pms = this.storageService.get<string[]>(Constants.MESSAGES_STORAGE_KEY);
-    if (pms != null) this.previousMessages.set(pms);
-
-    const chat = this.storageService.get<Message[]>(Constants.CHAT_STORAGE_KEY);
-    if (chat != null) this.messages.set(chat);
+    var sId = this.storageService.get<string>(Constants.SESSIONID_STORAGE_KEY);
+    if (sId != undefined && sId != '') {
+      this.sessionId.set(sId);
+    } else {
+      this.sessionId.set(crypto.randomUUID());
+      this.storageService.set(Constants.SESSIONID_STORAGE_KEY, this.sessionId());
+    }
   }
 
   ngAfterViewChecked(): void {
@@ -78,31 +75,44 @@ export class DocumentChatComponent implements OnInit, AfterViewChecked {
   }
 
   reset() {
-    this.storageService.remove(Constants.CHAT_STORAGE_KEY);
-    this.storageService.remove(Constants.MESSAGES_STORAGE_KEY);
-    this.previousMessages.set([]);
     this.messages.set([]);
   }
 
   search() {
     if (this.searchText() != '') {
       this.start();
-      this.documentService.SearchDocument(this.searchText(), this.previousMessages())?.subscribe({
+      this.agentService.Run(this.searchText(), this.sessionId())?.subscribe({
         next: (data) => {
           if (data != undefined && data != null) {
-            var res: ApiResponse<string> = new ApiResponse<string>(data);
+            var res: ApiResponse<TaskResponse> = new ApiResponse<TaskResponse>(data);
             if (
               res != undefined &&
               res != null &&
               res.isSuccess() &&
               res.result != undefined &&
-              res.result != ''
+              res.result != null
             ) {
+              if (!res.result.message.includes('TooManyRequests')) {
+                const task = createTask(res.result);
+
+                var list =
+                  task.data.length > 0
+                    ? task.data.map((t) => `${t.id}. ${t.name} [${t.description}]`)
+                    : '';
+
+                this.updateMessages(this.searchText(), 'user');
+                this.updateMessages(`${task.message} ${list}`, 'ai', this.displayTime());
+              }
+              this.searchText.set('');
+            } else {
               this.updateMessages(this.searchText(), 'user');
-              this.updateMessages(res.result?.toString(), 'ai', this.displayTime());
-              this.updatePreviousMessages(this.searchText());
+              this.updateMessages(
+                'Too Many Request, please Try Again',
+                'ai',
+                this.displayTime(),
+                true,
+              );
             }
-            this.searchText.set('');
             this.stop();
           }
         },
@@ -122,16 +132,6 @@ export class DocumentChatComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  updatePreviousMessages(message: string) {
-    this.previousMessages.update((arr) => {
-      if (!arr.includes(message)) {
-        return [...arr, message];
-      }
-      return arr;
-    });
-    this.storageService.set<string[]>(Constants.MESSAGES_STORAGE_KEY, this.previousMessages());
-  }
-
   updateMessages(
     message: string,
     type: 'user' | 'ai',
@@ -142,6 +142,5 @@ export class DocumentChatComponent implements OnInit, AfterViewChecked {
       var m = { type: type, message: message, time: time, isError: isError };
       return [...arr, m];
     });
-    this.storageService.set<Message[]>(Constants.CHAT_STORAGE_KEY, this.messages());
   }
 }

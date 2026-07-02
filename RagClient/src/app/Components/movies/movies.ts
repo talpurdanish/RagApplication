@@ -20,7 +20,7 @@ import createDefaultFilter, { Filter } from '../../BussinessLogic/Models/Generic
 
 import { Constants } from '../../BussinessLogic/Helpers/Constants';
 import { StorageService } from '../../BussinessLogic/Services/Storage.Service';
-import { Progress } from "../../Layouts/MainLayout/progress/progress";
+import { Progress } from '../../Layouts/MainLayout/progress/progress';
 
 @Component({
   selector: 'app-movies',
@@ -33,10 +33,7 @@ import { Progress } from "../../Layouts/MainLayout/progress/progress";
 })
 export class MoviesComponent {
   movieClicked = signal<boolean>(false);
-  selectedMovie = signal<string>('');
-  selectedAiInsight = signal<string | null>(null);
-  selectedMovieWidth = signal<number>(0);
-  selectedMovieHeight = signal<number>(0);
+  selectedMovie = signal<MovieModel | null>(null);
 
   analysisTypes: { name: string; value: number }[] = [
     { name: 'Jina Weighted', value: 1 },
@@ -173,11 +170,6 @@ export class MoviesComponent {
     );
   }
 
-  hasNext = signal<boolean>(true);
-  hasPrev = signal<boolean>(false);
-  currentIndex = signal<number>(0);
-  total = signal<number>(0);
-
   updatePage(currentPage: number) {
     this.filter.update((f: Filter) => {
       f.page = currentPage;
@@ -185,52 +177,6 @@ export class MoviesComponent {
     });
 
     this.loadMovies();
-  }
-
-  showMovie(movie: MovieModel, index: number) {
-    this.updateNavigation(index);
-    this.movieClicked.set(true);
-  }
-
-  updateNavigation(index: number) {
-    var iList = this.list();
-    if (iList != undefined && iList != null) {
-      this.total.set(iList.totalRecords);
-      this.hasNext.set(index < this.total() - 1);
-      this.hasPrev.set(index > 0);
-      this.currentIndex.set(index);
-    }
-  }
-
-  showNext() {
-    if (this.hasNext()) {
-      var iList = this.list();
-      if (iList != undefined && iList != null) {
-        var newIndex = this.currentIndex() + 1;
-        this.showMovie(iList.movies[newIndex], newIndex);
-        this.updateNavigation(newIndex);
-      }
-    }
-  }
-
-  showPrev() {
-    if (this.hasPrev()) {
-      var iList = this.list();
-      if (iList != undefined && iList != null) {
-        var newIndex = this.currentIndex() - 1;
-        this.showMovie(iList.movies[newIndex], newIndex);
-        this.updateNavigation(newIndex);
-        this.updateNavigation(newIndex);
-      }
-    }
-  }
-
-  closeMovie() {
-    this.selectedAiInsight.set('');
-    this.selectedMovie.set('');
-    this.selectedMovieWidth.set(-1);
-    this.selectedMovieHeight.set(-1);
-    this.movieClicked.set(false);
   }
 
   inputChanged() {
@@ -251,7 +197,6 @@ export class MoviesComponent {
           this.list.set(iList);
           this.searchInProgress.set(false);
           this.searched.set(true);
-          this.updateNavigation(0);
         }
       },
       error: () => {
@@ -259,7 +204,37 @@ export class MoviesComponent {
 
         this.searchInProgress.set(false);
         this.searched.set(true);
-        this.updateNavigation(0);
+      },
+    });
+  }
+
+  showMovie(movie: MovieModel) {
+    this.getSimilar(movie.id);
+    this.selectedMovie.set(movie);
+    this.movieClicked.set(true);
+  }
+
+  closeMovie() {
+    this.selectedMovie.set(null);
+    this.movieClicked.set(false);
+  }
+
+  getSimilarInProgress = signal<boolean>(false);
+  similarMovies = signal<PagedResults>(this.defaultPagedResults);
+
+  getSimilar(id: number) {
+    this.getSimilarInProgress.set(true);
+    this.movieService.GetSimilar(id)?.subscribe({
+      next: (data) => {
+        if (!data.error && data.results) {
+          const iList = createPagedResults(data.results);
+          this.similarMovies.set(iList);
+          this.getSimilarInProgress.set(false);
+        }
+      },
+      error: () => {
+        this.similarMovies.set(this.defaultPagedResults);
+        this.getSimilarInProgress.set(false);
       },
     });
   }

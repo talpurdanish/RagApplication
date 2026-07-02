@@ -17,7 +17,7 @@ namespace RagWebApi.Service.Movies
         Task StartAnalysis(int type);
         Task<PagedResults> SearchAsync(WeightedQuery query);
 
-        Task<IEnumerable<MovieViewModel>> RecommendAsync(int id);
+        Task<PagedResults> GetSimilarMoviesAsync(int id);
         Task<bool> UpdateEmbeddings(List<MovieEmbeddingsResult> results, EmbeddingsType type);
 
         Task<bool> DeleteAllEmbeddings(EmbeddingsType type);
@@ -131,9 +131,53 @@ namespace RagWebApi.Service.Movies
             return await query.Where(m => m.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<MovieViewModel>> RecommendAsync(int id)
+        public async Task<PagedResults> GetSimilarMoviesAsync(int id)
         {
-            throw new NotImplementedException();
+
+            var query = new WeightedQuery()
+            {
+                MovieId = id
+            };
+            var movieQuery = context.Movies.
+                Include(m => m.MovieCasts)
+                .ThenInclude(mc => mc.Actor)
+                 .Include(m => m.MovieKeywords)
+                        .ThenInclude(mk => mk.Keyword)
+                .Select(m => new MiniMovieViewModel()
+                {
+                    Id = m.Id,
+                    Title = m.Title,
+                    Keywords = m.MovieKeywords.Select(mk => new Keyword
+                    {
+                        Id = mk.Keyword != null ? mk.Keyword.Id : 0,
+                        Name = mk.Keyword != null ? mk.Keyword.Name : ""
+                    }).ToList(),
+                    Actors = m.MovieCasts.Select(mc => new Actor
+                    {
+                        Id = mc.Actor != null ? mc.Actor.Id : 0,
+                        Name = mc.Actor != null ? mc.Actor.Name : ""
+                    }).ToList()
+
+                }).AsNoTracking().AsSplitQuery();
+            List<SearchResults>? searchresults = await notifier.TriggerSearchQuery(query);
+            var ids = searchresults.Select(s => s.MovieId).ToList();
+            var movies = await movieQuery.Where(m => ids.Contains(m.Id)).ToListAsync();
+
+            var enrichedMovies = movies
+                 .Select(m => new MiniMovieViewModel
+                 {
+                     Id = m.Id,
+                     Title = m.Title,
+                     Keywords = m.Keywords,
+                     Actors = m.Actors,
+                     Similarity = searchresults.FirstOrDefault(s => s.MovieId == m.Id)?.Similarity ?? 0f
+                 })
+                 .OrderByDescending(m => m.Similarity)
+                 .Take(5)
+                 .ToList();
+
+
+            return new PagedResults(enrichedMovies);
         }
 
         public async Task<PagedResults> SearchAsync(WeightedQuery query)
@@ -286,7 +330,7 @@ namespace RagWebApi.Service.Movies
         public async Task<bool> DeleteAllEmbeddings(EmbeddingsType type)
         {
             
-            int count = 0;
+            int count;
             if (type == EmbeddingsType.jina)
             {
                 var movieEmbeddings = await context.MovieEmbeddings.ToListAsync();
@@ -324,7 +368,7 @@ namespace RagWebApi.Service.Movies
                     context.MovieEmbeddings.RemoveRange(movieEmbeddings);
                 }
 
-                movieEmbeddings = results.Select(r => new MovieEmbedding()
+                movieEmbeddings = [.. results.Select(r => new MovieEmbedding()
                 {
 
                     MovieId = r.MovieId,
@@ -344,7 +388,7 @@ namespace RagWebApi.Service.Movies
                     ProductionCompanies = ToJsonString(r.MovieEmbeddings, 13),
                     ProductionCountries = ToJsonString(r.MovieEmbeddings, 14),
                     SpokenLanguages = ToJsonString(r.MovieEmbeddings, 15),
-                }).ToList();
+                })];
 
                 context.MovieEmbeddings.AddRange(movieEmbeddings);
             }
@@ -358,12 +402,12 @@ namespace RagWebApi.Service.Movies
                     context.MovieEmbeddingsCombined.RemoveRange(movieEmbeddings);
                 }
 
-                movieEmbeddings = results.Select(r => new MovieEmbeddingCombined()
+                movieEmbeddings = [.. results.Select(r => new MovieEmbeddingCombined()
                 {
                     MovieId = r.MovieId,
                     FullTextEmbeddings = ToJsonString(r.MovieEmbeddings, 0),
                     
-                }).ToList();
+                })];
 
                 context.MovieEmbeddingsCombined.AddRange(movieEmbeddings);
 

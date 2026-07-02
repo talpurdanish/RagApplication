@@ -8,6 +8,7 @@ import { GenerateImagesComponent } from './Components/generate.image/generate.im
 import { MoviesComponent } from './Components/movies/movies';
 import { ConfigMoviesComponent } from './Components/config.movies/movies.config';
 import { DocumentChatComponent } from './Components/documentchat/document.chat';
+import { AgentsComponent } from './Components/agents/agents';
 
 export const routes: Routes = [
   {
@@ -41,6 +42,10 @@ export const routes: Routes = [
       {
         path: RouterPaths.configmovies,
         component: ConfigMoviesComponent,
+      },
+      {
+        path: RouterPaths.agents,
+        component: AgentsComponent,
       },
       {
         path: '',

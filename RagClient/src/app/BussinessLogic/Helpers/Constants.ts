@@ -23,6 +23,8 @@ export const Constants = {
   RECEIPT_STORAGE_KEY: 'receipt',
   PRESCRIPTION_STORAGE_KEY: 'prescription',
   MESSAGES_STORAGE_KEY: 'messages',
+  SESSIONID_STORAGE_KEY: 'sessionId',
+
   CHAT_STORAGE_KEY: 'chats',
   WEIGHTS_STORAGE_KEY: 'weights',
 

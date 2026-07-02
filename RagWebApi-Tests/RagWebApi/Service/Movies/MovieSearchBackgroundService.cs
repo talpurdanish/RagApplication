@@ -65,6 +65,16 @@ namespace RagWebApi.Service.Movies
             return 0.7 * similarity + 0.15 * nPopularity + 0.15 * nVoteAverage;
         }
 
+        private static double ComputeWeightedSimilarity(float[] query, float[] embeddings, Movie? mv)
+        {
+            var similarity = CosineSimilarity(query, embeddings);
+
+            var nPopularity = mv is not null ? Normalize(mv.Popularity, 0, 200) : 0;
+            var nVoteAverage = mv is not null ? Normalize(mv.VoteAverage, 0, 10) : 0;
+
+            return 0.7 * similarity + 0.15 * nPopularity + 0.15 * nVoteAverage;
+        }
+
         private static double ComputeWeightedSimilarity(Embedding<float> query, List<WeightedEmbeddings> embeddings, Movie? mv)
         {
             var weightedScores = embeddings
@@ -94,15 +104,49 @@ namespace RagWebApi.Service.Movies
 
                 if (!success || queryEmbeddings == null)
                     return [];
-                List<SearchResults> results = isCombined ?
-                    await ProcessSearch(context, queryEmbeddings) :
-                    await ProcessSearch(context, query, queryEmbeddings);
+                List<SearchResults> results = query.MovieId > 0 ?
+                    await ProcessSearch(context, query.MovieId) :
+                    isCombined ?
+                        await ProcessSearch(context, queryEmbeddings) :
+                        await ProcessSearch(context, query, queryEmbeddings);
 
                 return await Task.FromResult(results);
 
             }
         }
 
+        private static async Task<List<SearchResults>> ProcessSearch(RagContext context, int movieId)
+        {
+            List<SearchResults> results = [];
+            var movieEmbeddings = await context.MovieEmbeddingsCombined.ToListAsync();
+            var movies = await context.Movies.ToListAsync();
+            var baseEmbeddings = movieEmbeddings.FirstOrDefault(me => me.Id == movieId)?.FullTextEmbeddings;
+            if (baseEmbeddings == null)
+                return results;
+            foreach (var movie in movieEmbeddings)
+            {
+                try
+                {
+                    var mv = movies.FirstOrDefault(m => m.Id == movie.Id);
+                    var embeddings = JsonConvert.DeserializeObject<float[]>(movie.FullTextEmbeddings);
+                    var mEmbeddings = JsonConvert.DeserializeObject<float[]>(baseEmbeddings);
+                    if (mEmbeddings is null)
+                        break;
+                    if (embeddings is null)
+                        continue;
+                    var searchResult = ComputeWeightedSimilarity(mEmbeddings, embeddings, mv);
+                    results.Add(new SearchResults(movie.MovieId, searchResult));
+
+                }
+                catch (Exception ex)
+                {
+                    throw new ArgumentException($"Error analyzing movie {movie.Id}: {ex.Message}");
+                }
+
+
+            }
+            return results;
+        }
         private static async Task<List<SearchResults>> ProcessSearch(RagContext context, WeightedQuery query, Embedding<float> queryEmbeddings)
         {
 

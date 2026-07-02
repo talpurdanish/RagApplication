@@ -100,15 +100,15 @@ namespace RagWebApi.Controllers
 
 
         [HttpGet("[action]/{id}")]
-        public async Task<JsonResult> RecommendMovies(int id)
+        public async Task<JsonResult> GetSimilarMovies(int id)
         {
             try
             {
-                var result = await _moviesService.RecommendAsync(id);
+                var result = await _moviesService.GetSimilarMoviesAsync(id);
                 if (result != null)
                     return OutputResults.Success(result);
                 else
-                    return OutputResults.Error("Movie not found", 404);
+                    return OutputResults.Error("No movies found", 404);
             }
             catch (Exception ex)
             {

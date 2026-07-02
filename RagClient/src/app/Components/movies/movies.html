@@ -62,22 +62,24 @@
         <div
           class="border border-gray-600 p-2 flex-1/4 max-w-[33%] overflow-hidden relative rounded"
         >
-          <div class="cursor-pointer w-full h-full overflow-hidden">
-            <div class="flex-1 gap-1">
-              <span class="font-bold">Title:</span>
-              {{ movie.title }}
-            </div>
+          <a (click)="showMovie(movie)" class="cursor-pointer">
+            <div class="cursor-pointer w-full h-full overflow-hidden">
+              <div class="flex-1 gap-1">
+                <span class="font-bold">Title:</span>
+                {{ movie.title }}
+              </div>
 
-            <div class="flex-1 gap-1">
-              <span class="font-bold">Casts:</span>
-              {{ movie.actorsString }}
-            </div>
+              <div class="flex-1 gap-1">
+                <span class="font-bold">Casts:</span>
+                {{ movie.actorsString }}
+              </div>
 
-            <div class="flex-1 gap-1">
-              <span class="font-bold">Keywords:</span>
-              {{ movie.keywordsString }}
+              <div class="flex-1 gap-1">
+                <span class="font-bold">Keywords:</span>
+                {{ movie.keywordsString }}
+              </div>
             </div>
-          </div>
+          </a>
           @if (searched()) {
             <p class="absolute bottom-1 right-1 text-red-500 text-bold bg-black p-1">
               {{ movie.similarity | number: '1.5-5' }}
@@ -127,4 +129,68 @@
     </div>
   }
   <!-- Paging End -->
+
+  <!-- Movie View -->
+
+  @if (movieClicked() && selectedMovie() != null) {
+    <div class="absolute left-0 top-0 w-full h-full backdrop-blur-lg inset-0 p-4 bg-black/30">
+      <div class="p-4 relative w-full h-full mx-auto">
+        <div class="flex">
+          <div class="flex-4/6">
+            <div class="cursor-pointer w-full h-full overflow-hidden">
+              <div class="flex-1 gap-1">
+                <span class="font-bold">Title:</span>
+                {{ selectedMovie()?.title }}
+              </div>
+
+              <div class="flex-1 gap-1">
+                <span class="font-bold">Casts:</span>
+                {{ selectedMovie()?.actorsString }}
+              </div>
+
+              <div class="flex-1 gap-1">
+                <span class="font-bold">Keywords:</span>
+                {{ selectedMovie()?.keywordsString }}
+              </div>
+            </div>
+          </div>
+
+          <div class="flex-2/6">
+            <div class="uppercase text-xl text-center btn-warning">Similar Movies</div>
+            @if (
+              similarMovies() != null &&
+              similarMovies().currentPage <= similarMovies().totalPages &&
+              similarMovies().totalRecords > 0
+            ) {
+              @for (movie of similarMovies().movies; track $index) {
+                <div class="cursor-pointer w-full h-full overflow-hidden">
+                  <div class="flex-1 gap-1">
+                    <span class="font-bold">Title:</span>
+                    {{ movie.title }}
+                  </div>
+
+                  <div class="flex-1 gap-1">
+                    <span class="font-bold">Casts:</span>
+                    {{ movie.actorsString }}
+                  </div>
+
+                  <div class="flex-1 gap-1">
+                    <span class="font-bold">Keywords:</span>
+                    {{ movie.keywordsString }}
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </div>
+
+        <button
+          class="w-10 h-10 absolute -top-2 -right-2 bg-black/50 border border-gray-700 disabled:bg-gray-200 shadow-2xl dark:shadow-gray-300 shadow-gray-900 rounded-full font-bold cursor-pointer text-red-500 justify-center items-center"
+          (click)="closeMovie()"
+        >
+          <ng-icon name="lucideX" color="red" size="24" strokeWidth="2" class="m-auto"></ng-icon>
+        </button>
+      </div>
+    </div>
+  }
 </div>

@@ -71,7 +71,7 @@ namespace RagWebApi.Service.Movies
                                                 Dimensions = 256,
                                             });
 
-                    var generatedEmbeddings = new GeneratedEmbeddings<Embedding<float>>(new List<Embedding<float>>() { embeddings });
+                    var generatedEmbeddings = new GeneratedEmbeddings<Embedding<float>>([embeddings]);
                     return (true, generatedEmbeddings);
                 }
                 catch (Exception e)
@@ -99,10 +99,10 @@ namespace RagWebApi.Service.Movies
 
                 try
                 {
-                    List<AnyOf<string, TextDoc, ImageDoc>> items = texts.Select(t => new AnyOf<string, TextDoc, ImageDoc>(t)).ToList();
+                    List<AnyOf<string, TextDoc, ImageDoc>> items = [.. texts.Select(t => new AnyOf<string, TextDoc, ImageDoc>(t))];
 
                     var embeddings = await jinaWrapper.GenerateMixedEmbeddingsAsync(
-                                            items.ToArray(),
+                                            [.. items],
                                             new EmbeddingGenerationOptions
                                             {
                                                 Dimensions = 256,

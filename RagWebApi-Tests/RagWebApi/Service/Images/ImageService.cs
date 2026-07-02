@@ -125,7 +125,7 @@ namespace RagWebApi.Service.Images
                     AIInsights = m.AIInsights
                 });
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
                 throw;

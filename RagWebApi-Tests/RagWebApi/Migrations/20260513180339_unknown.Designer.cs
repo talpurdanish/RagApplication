@@ -13,7 +13,7 @@ namespace RagWebApi.Migrations
 {
     [DbContext(typeof(RagContext))]
     [Migration("20260513180339_unknown")]
-    partial class unknown
+    partial class Unknown
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

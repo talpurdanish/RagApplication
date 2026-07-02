@@ -52,4 +52,11 @@ export class MovieService {
     const res = this.client.get<string>(url, convertWeights(weights));
     return res;
   }
+
+  GetSimilar(id: number): Observable<ApiResponse<string>> | null {
+    if (id <= 0) return null;
+    const url = `${baseUri}/GetSimilarMovies/${id}`;
+    const res = this.client.get<string>(url);
+    return res;
+  }
 }

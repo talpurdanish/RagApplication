@@ -98,5 +98,7 @@ namespace RagWebApi.Viewmodels
 
         public int Type { get; set; }
 
+        public int MovieId { get; set; } = -1;
+
     }
 }

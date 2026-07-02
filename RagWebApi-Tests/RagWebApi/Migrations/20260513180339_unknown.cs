@@ -5,7 +5,7 @@
 namespace RagWebApi.Migrations
 {
     /// <inheritdoc />
-    public partial class unknown : Migration
+    public partial class Unknown : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
