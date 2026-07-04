@@ -8,7 +8,7 @@ import { DecimalPipe } from '@angular/common';
 
 import { Constants } from '../../BussinessLogic/Helpers/Constants';
 import { StorageService } from '../../BussinessLogic/Services/Storage.Service';
-import { Progress } from "../../Layouts/MainLayout/progress/progress";
+import { Progress } from '../../Layouts/MainLayout/progress/progress';
 
 interface UploadModel {
   file: File | null;
@@ -133,7 +133,7 @@ export class ConfigMoviesComponent {
       action: async (field) => {
         const payload = new FormData();
         const inputFile = field.file().value();
-        console.log(inputFile);
+
         if (inputFile != null) {
           this.fileSelected.set(false);
           this.singleInProcess.set(true);

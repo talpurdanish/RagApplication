@@ -84,3 +84,6 @@ dist/
 # Docker
 docker-compose.override.yml
 *.dockerfile
+
+#sixlabors lic
+*.lic

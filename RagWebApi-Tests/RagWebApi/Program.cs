@@ -2,6 +2,11 @@ using DotNetEnv;
 using Jina;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.ChatCompletion;
+using Mistral.SDK;
+using RagWebApi.Agent;
+using RagWebApi.Agent.WorkerAgents;
 using RagWebApi.DataContext;
 using RagWebApi.Service;
 using RagWebApi.Service.Documents;
@@ -44,12 +49,34 @@ services.AddDbContext<RagContext>(options =>
     options.EnableServiceProviderCaching();
 });
 
-
 services.AddControllers();
 
 string jinaKey = config["JINA_KEY"]!;
 string openRouterApiKey = config["OPEN_ROUTER_KEY"]!;
 string cloudFlareKey = config["CLOUD_FLARE_KEY"]!;
+string mistralKey = config["MISTRAL_KEY"]!;
+
+//services.AddSingleton<AgentSessionManager>();
+services.AddSingleton<IChatClient>(sp =>
+    new ChatClientBuilder(new MistralClient(new APIAuthentication(mistralKey)).Completions)
+        .UseFunctionInvocation()
+        .Build());
+services.AddSingleton<IChatCompletionService>(sp =>
+    sp.GetRequiredService<IChatClient>().AsChatCompletionService());
+
+
+var kernelBuilder = services.AddKernel();
+kernelBuilder.Plugins.AddFromType<TaskPlugin>("Tasks");
+kernelBuilder.Plugins.AddFromType<EmailPlugin>("Email");
+
+services.AddTransient<TaskPlugin>();
+services.AddTransient<EmailPlugin>();
+services.AddTransient<TaskAgent>();
+services.AddTransient<EmailAgent>();
+
+services.AddTransient<RouterAgent>();
+services.AddSingleton<AgentSessionManager>();
+
 
 services.AddKeyedSingleton<JinaClient>(serviceKey: null, (serviceProvider, _) =>
     new JinaClient(jinaKey));
@@ -95,7 +122,10 @@ services.AddHostedService<DocumentEmbeddingsBackgroundService>();
 services.AddCors(o => o.AddPolicy("CorsPolicy", builder =>
 {
     builder
-        .WithOrigins("http://localhost:3100", "http://localhost:3000", "http://localhost:5173", "http://localhost:4200")
+        .WithOrigins("http://localhost:3100", 
+                     "http://localhost:3000", 
+                     "http://localhost:5173", 
+                     "http://localhost:4200")
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials();
@@ -108,6 +138,8 @@ services.AddScoped<IImageService, ImageService>();
 
 services.AddScoped<IMovieService, MovieService>();
 services.AddScoped<IMovieAiService, MovieAiService>();
+
+services.AddScoped<ISupervisorAgent, SupervisorAgent>();
 
 services.AddHealthChecks();
 

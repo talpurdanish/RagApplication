@@ -30,7 +30,6 @@ export interface TaskResponse {
 }
 
 export function createTask(raw: any): TaskResponse {
-  console.log(raw);
   return {
     success: raw.success ?? false,
     message: raw.message ?? '',

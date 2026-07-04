@@ -50,6 +50,7 @@
       (change)="searchText.set($event.target.value)"
       (keydown)="searchText.set($event.target.value)"
       (keydown.enter)="search()"
+      (keydown.arrowUp)="addLastMessage()"
     />
     <button
       class="ml-2 px-4 py-2 btn btn-success btn-rounded"
@@ -62,12 +63,12 @@
         Send
       }
     </button>
-    <button
-      class="ml-2 px-2 py-3 btn btn-danger btn-rounded"
-      (click)="reset()"
-      [disabled]="isRunning()"
-    >
-      <ng-icon name="lucideX"></ng-icon>
+    <button class="ml-2 px-2 py-3 btn btn-danger btn-rounded" (click)="reset()">
+      @if (isRunning()) {
+        <ng-icon name="lucideSquare"></ng-icon>
+      } @else {
+        <ng-icon name="lucideX"></ng-icon>
+      }
     </button>
   </div>
 </div>

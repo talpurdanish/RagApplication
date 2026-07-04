@@ -1,6 +1,6 @@
 import { Component, computed, ElementRef, signal, ViewChild } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideSend, lucideX, lucideUser2, lucideBot } from '@ng-icons/lucide';
+import { lucideSend, lucideX, lucideUser2, lucideBot, lucideSquare } from '@ng-icons/lucide';
 import {
   AgentService,
   createTask,
@@ -14,7 +14,7 @@ import { Constants } from '../../BussinessLogic/Helpers/Constants';
   selector: 'app-agents',
   imports: [NgIcon],
   providers: [AgentService, NgIcon],
-  viewProviders: [provideIcons({ lucideSend, lucideX, lucideUser2, lucideBot })],
+  viewProviders: [provideIcons({ lucideSend, lucideX, lucideUser2, lucideBot, lucideSquare })],
   templateUrl: './agents.html',
   styleUrl: './agents.css',
 })
@@ -46,6 +46,7 @@ export class AgentsComponent {
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;
+      this.scrollToBottom();
     }
   }
 
@@ -62,6 +63,9 @@ export class AgentsComponent {
       this.sessionId.set(crypto.randomUUID());
       this.storageService.set(Constants.SESSIONID_STORAGE_KEY, this.sessionId());
     }
+
+    const chat = this.storageService.get<Message[]>(Constants.CHAT_STORAGE_KEY);
+    if (chat != null) this.messages.set(chat);
   }
 
   ngAfterViewChecked(): void {
@@ -70,12 +74,22 @@ export class AgentsComponent {
 
   scrollToBottom() {
     if (this.chatWindow) {
-      this.chatWindow.nativeElement.scrollTop = this.chatWindow.nativeElement.scrollHeight;
+      this.chatWindow?.nativeElement.scrollTo({
+        top: this.chatWindow.nativeElement.scrollHeight,
+        behavior: 'smooth',
+      });
     }
   }
 
   reset() {
-    this.messages.set([]);
+    if (!this.isRunning()) {
+      this.messages.set([]);
+      this.storageService.remove(Constants.CHAT_STORAGE_KEY);
+    } else {
+      this.stop();
+      this.isRunning.set(false);
+    }
+    this.searchText.set('');
   }
 
   search() {
@@ -102,16 +116,16 @@ export class AgentsComponent {
 
                 this.updateMessages(this.searchText(), 'user');
                 this.updateMessages(`${task.message} ${list}`, 'ai', this.displayTime());
+              } else {
+                this.updateMessages(this.searchText(), 'user');
+                this.updateMessages(
+                  'Too Many Request, please Try Again',
+                  'ai',
+                  this.displayTime(),
+                  true,
+                );
               }
               this.searchText.set('');
-            } else {
-              this.updateMessages(this.searchText(), 'user');
-              this.updateMessages(
-                'Too Many Request, please Try Again',
-                'ai',
-                this.displayTime(),
-                true,
-              );
             }
             this.stop();
           }
@@ -142,5 +156,17 @@ export class AgentsComponent {
       var m = { type: type, message: message, time: time, isError: isError };
       return [...arr, m];
     });
+    this.storageService.set<Message[]>(Constants.CHAT_STORAGE_KEY, this.messages());
+  }
+
+  addLastMessage() {
+    const len = this.messages().length;
+    if (len > 0) {
+      const lMessage = this.messages().filter((m) => m.type == 'user');
+      const fLen = lMessage.length;
+      const lastMessage = lMessage[fLen - 1] != undefined ? lMessage[fLen - 1].message : '';
+
+      this.searchText.set(lastMessage);
+    }
   }
 }
