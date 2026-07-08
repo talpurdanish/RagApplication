@@ -1,1 +1,10 @@
+@if ((apiHealthService.apiStatus$ | async) === false) {
+  <div class="absolute top-0 left-0 w-full h-full bg-black/70 flex items-center justify-center">
+    <div
+      class="flex justify-center items-center w-[50%] h-30 p-4 m-4 dark:bg-black bg-white text-black dark:text-white border rounded dark:border-white border-black text-2xl"
+    >
+      <p>⚠️ Backend API is unreachable {{ apiHealthService.apiStatus$ | async }}</p>
+    </div>
+  </div>
+}
 <router-outlet></router-outlet>
