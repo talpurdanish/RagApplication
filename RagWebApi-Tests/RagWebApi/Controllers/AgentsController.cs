@@ -23,8 +23,12 @@ namespace RagWebApi.Controllers
 
                
                 var result = await agent.ProcessRequestAsync(input, sessionId);
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine(result.Message);
+                Console.ResetColor();
                 if (result != null)
-                    return OutputResults.Success(result);
+                    return OutputResults.Success(result, 200);
                 else
                     return OutputResults.Error("Tasks not found", 404);
             }

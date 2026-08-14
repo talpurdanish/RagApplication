@@ -16,7 +16,8 @@ namespace RagWebApi.Models
             {
                 StatusCode = statusCode,
                 ContentType = "application/json"
-            };
+            }; 
+
         }
 
         public static JsonResult Success(string message, object? results, int statusCode = 200)
